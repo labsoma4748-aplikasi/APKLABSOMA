@@ -25,19 +25,29 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
 
-      - name: Install Capacitor CLI & Android
+      - name: Install Capacitor CLI & Android Tools
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
       - name: Prepare Dummy Web Directory
         run: |
           mkdir -p www
           echo '<!DOCTYPE html><html><head><title>App</title></head><body></body></html>' > www/index.html
 
-      - name: Add Android Platform & Sync
+      - name: Add Android Platform
         run: |
           npx cap add android || true
+
+      - name: Generate App Icons from icon.png
+        run: |
+          if [ -f "icon.png" ] || [ -f "docs/icon.png" ]; then
+            [ -f "docs/icon.png" ] && cp docs/icon.png ./icon.png || true
+            npx capacitor-assets generate --android || true
+          fi
+
+      - name: Sync Capacitor
+        run: |
           npx cap sync android
 
       - name: Fix Kotlin Duplicate Class Conflict
