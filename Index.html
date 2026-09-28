@@ -1934,99 +1934,21 @@
       'Halaman ' + (indeksSlideAgenda + 1) + ' dari ' + totalSlide;
   }
 
-  let timerSlideAgenda = null;
-  let timerScrollInterval = null;
-  let timerJedaTimeout = null;
-
-  function batalkanSemuaTimerAgenda() {
-    if (timerScrollInterval) {
-      clearInterval(timerScrollInterval);
-      timerScrollInterval = null;
+  function mulaiSlideAgendaDashboard() {
+    if (timerAgendaDashboard) {
+      clearInterval(timerAgendaDashboard);
     }
-    if (timerJedaTimeout) {
-      clearTimeout(timerJedaTimeout);
-      timerJedaTimeout = null;
-    }
-    if (timerSlideAgenda) {
-      clearTimeout(timerSlideAgenda);
-      timerSlideAgenda = null;
-    }
-  }
 
-  function jalankanOtomasisSlideAgenda() {
-    batalkanSemuaTimerAgenda();
-
-    const totalSlide = 1 + (pengumumanDashboard || []).length;
-    if (totalSlide <= 0) return;
-
-    // 1. Tampilkan slide saat ini
+    indeksSlideAgenda = 0;
     gambarSlideAgendaDashboard();
 
-    // Jika hanya ada 1 slide dan tidak ada pengumuman, tidak perlu autoscroll/pindah slide
-    if (totalSlide === 1 && (!pengumumanDashboard || pengumumanDashboard.length === 0)) {
-      return;
+    if (pengumumanDashboard.length) {
+      timerAgendaDashboard = setInterval(function() {
+        indeksSlideAgenda =
+          (indeksSlideAgenda + 1) % (1 + pengumumanDashboard.length);
+        gambarSlideAgendaDashboard();
+      }, INTERVAL_GANTI_ANGGOTA);
     }
-
-    // 2. Cari kontainer yang sedang aktif untuk di-scroll
-    let wadahAktif = null;
-    if (indeksSlideAgenda === 0) {
-      const panel1 = document.querySelector('#dashboardAgendaSlide .agenda-panel:nth-child(1)');
-      const panel2 = document.querySelector('#dashboardAgendaSlide .agenda-panel:nth-child(2)');
-      
-      if (panel1 && panel1.scrollHeight > panel1.clientHeight) wadahAktif = panel1;
-      if (panel2 && panel2.scrollHeight > panel2.clientHeight && (!wadahAktif || panel2.scrollHeight > wadahAktif.scrollHeight)) {
-        wadahAktif = panel2;
-      }
-    } else {
-      wadahAktif = document.getElementById('dashboardPengumumanSlide');
-    }
-
-    // Reset posisi scroll ke atas
-    if (wadahAktif) wadahAktif.scrollTop = 0;
-
-    const butuhScroll = wadahAktif && (wadahAktif.scrollHeight - wadahAktif.clientHeight > 5);
-
-    const selesaiDanLanjut = function() {
-      // Tunggu jeda 5 detik di posisi paling bawah sebelum pindah slide
-      timerJedaTimeout = setTimeout(function() {
-        indeksSlideAgenda = (indeksSlideAgenda + 1) % totalSlide;
-        jalankanOtomasisSlideAgenda();
-      }, 5000);
-    };
-
-    if (butuhScroll) {
-      // Jeda 1 detik sebelum mulai scroll pelan
-      timerJedaTimeout = setTimeout(function() {
-        const kecepatanPixel = 1;
-        const intervalWaktu = 35; // ms
-
-        timerScrollInterval = setInterval(function() {
-          if (!wadahAktif) {
-            clearInterval(timerScrollInterval);
-            selesaiDanLanjut();
-            return;
-          }
-
-          // Cek apakah sudah menyentuh paling bawah
-          if (Math.ceil(wadahAktif.scrollTop + wadahAktif.clientHeight) >= wadahAktif.scrollHeight - 2) {
-            clearInterval(timerScrollInterval);
-            timerScrollInterval = null;
-            selesaiDanLanjut();
-          } else {
-            wadahAktif.scrollTop += kecepatanPixel;
-          }
-        }, intervalWaktu);
-      }, 1000);
-    } else {
-      // Jika konten pendek, langsung jalankan hitungan 5 detik
-      selesaiDanLanjut();
-    }
-  }
-
-  function mulaiSlideAgendaDashboard() {
-    batalkanSemuaTimerAgenda();
-    indeksSlideAgenda = 0;
-    jalankanOtomasisSlideAgenda();
   }
 
   function tampilkanDaftarEditPengumuman(daftar) {
@@ -2315,7 +2237,7 @@
   function sambungkanFormTambahan(id, method) {
     document.getElementById(id).addEventListener('submit',function(event){event.preventDefault();const form=event.currentTarget,data=Object.fromEntries(new FormData(form).entries());
       if(id==='formKalender')data.tampilkanSebagaiAgenda=!!form.elements.tampilkanSebagaiAgenda.checked;
-      mintaPin().then(function(pin){if(!pin)return;const runner=https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec.withSuccessHandler(function(msg){tampilkanNotifikasi(msg,'success');form.reset();muatAplikasi();}).withFailureHandler(function(e){tampilkanNotifikasi(e&&e.message?e.message:String(e),'error');});runner[method](data,pin);});
+      mintaPin().then(function(pin){if(!pin)return;const runner=google.script.run.withSuccessHandler(function(msg){tampilkanNotifikasi(msg,'success');form.reset();muatAplikasi();}).withFailureHandler(function(e){tampilkanNotifikasi(e&&e.message?e.message:String(e),'error');});runner[method](data,pin);});
     });
   }
   sambungkanFormTambahan('formCatatan','simpanCatatan');
@@ -2583,7 +2505,7 @@
   }
 
   function muatAplikasi() {
-    https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+    google.script.run
       .withSuccessHandler(function(data) {
         halamanAnggota = 0;
         dataAplikasiTersimpan = data;
@@ -2666,7 +2588,7 @@
 
     const pin = document.getElementById('pinInput').value;
 
-    https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+    google.script.run
       .withSuccessHandler(function(valid) {
         if (valid) {
           pinAdmin = pin;
@@ -2704,7 +2626,7 @@
         tampilkanNotifikasi(pesan, 'error');
       };
 
-      const runner = https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      const runner = google.script.run
         .withSuccessHandler(berhasil)
         .withFailureHandler(gagal);
 
@@ -2781,7 +2703,7 @@
     mintaPin().then(function(pin) {
       if (!pin) return;
 
-      https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      google.script.run
         .withSuccessHandler(function(pesan) {
           tampilkanNotifikasi(pesan, 'success');
           form.reset();
@@ -2816,7 +2738,7 @@
     mintaPin().then(function(pin) {
       if (!pin) return;
 
-      https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      google.script.run
         .withSuccessHandler(function(pesan) {
           tampilkanNotifikasi(pesan, 'success');
           muatAplikasi();
@@ -2870,7 +2792,7 @@
     mintaPin().then(function(pin) {
       if (!pin) return;
 
-      https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      google.script.run
         .withSuccessHandler(function(pesan) {
           tampilkanNotifikasi(pesan, 'success');
 
@@ -2920,7 +2842,7 @@
         return;
       }
 
-      https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      google.script.run
         .withSuccessHandler(function(hasil) {
           pesan.className = 'message success';
           pesan.textContent = hasil || 'Agenda berhasil ditambahkan.';
@@ -3028,7 +2950,7 @@
           return;
         }
 
-        const runner = https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+        const runner = google.script.run
           .withSuccessHandler(function(hasil) {
             tampilkanNotifikasi(
               hasil || 'Pengumuman berhasil disimpan.',
@@ -3081,7 +3003,7 @@
         return;
       }
 
-      https://script.google.com/macros/s/AKfycbx7KU5Qd0lJ1PIKLwGW0pehL394vXeo8_KGMVynjfbpGGvsvS8OXe3F2_eizPu_UrBc/exec
+      google.script.run
         .withSuccessHandler(function(hasil) {
           pesan.className = 'message success';
           pesan.textContent = hasil || 'Tugas berhasil ditambahkan.';
