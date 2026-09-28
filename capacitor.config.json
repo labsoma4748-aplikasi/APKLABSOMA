@@ -1,0 +1,9 @@
+{
+  "appId": "com.labsoma.app",
+  "appName": "APKLABSOMA",
+  "webDir": "www",
+  "server": {
+    "url": "https://labsoma4748-aplikasi.github.io/APKLABSOMA/",
+    "cleartext": true
+  }
+}
