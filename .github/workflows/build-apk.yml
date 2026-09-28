@@ -30,6 +30,11 @@ jobs:
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
+      - name: Create Web Dir if missing
+        run: |
+          mkdir -p www
+          touch www/index.html
+
       - name: Add Android Platform
         run: |
           npx cap add android || true
