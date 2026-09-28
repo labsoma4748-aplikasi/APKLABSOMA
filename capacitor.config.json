@@ -3,7 +3,7 @@
   "appName": "APKLABSOMA",
   "webDir": "www",
   "server": {
-    "url": "https://labsoma4748-aplikasi.github.io/APKLABSOMA/",
+    "url": "https://labsoma4748-aplikasi.github.io/APKLABSOMA/docs/",
     "cleartext": true
   }
 }
