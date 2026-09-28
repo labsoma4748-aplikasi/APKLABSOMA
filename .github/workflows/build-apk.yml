@@ -28,11 +28,18 @@ jobs:
       - name: Install Capacitor & Android Tools
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
-      - name: Add Android Platform & Sync
+      - name: Add Android Platform
         run: |
           npx cap add android || true
+
+      - name: Generate App Icons from icon.png
+        run: |
+          npx capacitor-assets generate --android || true
+
+      - name: Sync Capacitor
+        run: |
           npx cap sync android
 
       - name: Build Android APK
